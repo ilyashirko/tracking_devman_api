@@ -47,15 +47,13 @@ if __name__ == '__main__':
 
                 params.update(
                     {
-                        "timestamp": int(
-                            response["last_attempt_timestamp"] + 1
-                        )
+                        "timestamp": response["last_attempt_timestamp"]
                     }
                 )
             else:
                 params.update(
                     {
-                        "timestamp": int(response["timestamp_to_request"])
+                        "timestamp": response["timestamp_to_request"]
                     }
                 )
         except (requests.exceptions.ReadTimeout,
