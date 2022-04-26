@@ -1,3 +1,4 @@
+import json
 import time
 
 import requests
@@ -23,11 +24,10 @@ if __name__ == '__main__':
                 LONG_POLLING_URL,
                 headers=headers,
                 params=params
-            )
-            response_info = response.json()
-            if response_info["status"] == 'found':
+            ).json()
+            if response["status"] == 'found':
                 message = ''
-                for attempt in response_info["new_attempts"]:
+                for attempt in response["new_attempts"]:
                     lesson_title = attempt['lesson_title']
                     if attempt["is_negative"]:
                         message += (
@@ -48,17 +48,18 @@ if __name__ == '__main__':
                 params.update(
                     {
                         "timestamp": int(
-                            response_info["last_attempt_timestamp"] + 1
+                            response["last_attempt_timestamp"] + 1
                         )
                     }
                 )
             else:
                 params.update(
                     {
-                        "timestamp": int(response_info["timestamp_to_request"])
+                        "timestamp": int(response["timestamp_to_request"])
                     }
                 )
         except (requests.exceptions.ReadTimeout,
-                requests.exceptions.ConnectionError) as error:
+                requests.exceptions.ConnectionError,
+                json.decoder.JSONDecodeError) as error:
             print(f'{error}\nRepeate request...')
             time.sleep(5)
