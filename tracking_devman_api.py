@@ -45,7 +45,7 @@ if __name__ == '__main__':
                             """
                         )
                     bot.send_message(
-                        chat_id=env.str('USER_ID'),
+                        chat_id=env.str('TELEGRAM_USER_ID'),
                         text=dedent(message)
                     )
 

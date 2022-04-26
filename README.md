@@ -24,7 +24,7 @@ pip3 install -r requirements.txt
 ```
 DEVMAN_TOKEN=dgsdfs87dfg8ds7f8g7sd8f7g98s7df78
 TELEGRAM_TOKEN=23423423423:AKJJHjkbjHbkbjkbKjbkjbkjbKjbKJbkJbkJb
-USER_ID=123456789
+TELEGRAM_USER_ID=123456789
 ```
 Для запуска бота введите в командной строке:
 ```
