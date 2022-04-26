@@ -1,4 +1,5 @@
 import json
+from textwrap import dedent
 import time
 
 import requests
@@ -31,18 +32,21 @@ if __name__ == '__main__':
                     lesson_title = attempt['lesson_title']
                     if attempt["is_negative"]:
                         message += (
-                            f'The lesson "{attempt["lesson_title"]}" '
-                            f'has been sent for revision.\n\n'
-                            f'{attempt["lesson_url"]}'
+                            f"""
+                            The lesson "{attempt["lesson_title"]}" has been sent for revision.
+                            {attempt["lesson_url"]}
+                            """
                         )
                     else:
                         message += (
-                            f'Congratulations! '
-                            f'Lesson "{attempt["lesson_title"]}" passed!'
+                            f"""
+                            Congratulations!
+                            Lesson "{attempt["lesson_title"]}" passed!
+                            """
                         )
                     bot.send_message(
                         chat_id=env.str('USER_ID'),
-                        text=message
+                        text=dedent(message)
                     )
 
                 params.update(
