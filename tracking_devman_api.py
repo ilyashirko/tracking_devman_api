@@ -24,8 +24,11 @@ if __name__ == '__main__':
             response = requests.get(
                 LONG_POLLING_URL,
                 headers=headers,
-                params=params
+                params=params,
+                timeout=100
             ).json()
+            response.raise_for_status()
+            
             if response["status"] == 'found':
                 message = ''
                 for attempt in response["new_attempts"]:
@@ -60,8 +63,10 @@ if __name__ == '__main__':
                         "timestamp": response["timestamp_to_request"]
                     }
                 )
-        except (requests.exceptions.ReadTimeout,
+        except (requests.exceptions.HTTPError,
                 requests.exceptions.ConnectionError,
                 json.decoder.JSONDecodeError) as error:
             print(f'{error}\nRepeate request...')
             time.sleep(5)
+        except requests.exceptions.ReadTimeout:
+            pass
