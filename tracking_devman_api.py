@@ -29,11 +29,11 @@ if __name__ == '__main__':
             )
             response.raise_for_status()
 
-            response_metadata = response.json()
+            review_results = response.json()
 
-            if response_metadata["status"] == 'found':
+            if review_results["status"] == 'found':
                 message = ''
-                for attempt in response_metadata["new_attempts"]:
+                for attempt in review_results["new_attempts"]:
                     lesson_title = attempt['lesson_title']
                     if attempt["is_negative"]:
                         message += (
@@ -56,13 +56,13 @@ if __name__ == '__main__':
 
                 params.update(
                     {
-                        "timestamp": response_metadata["last_attempt_timestamp"]
+                        "timestamp": review_results["last_attempt_timestamp"]
                     }
                 )
             else:
                 params.update(
                     {
-                        "timestamp": response_metadata["timestamp_to_request"]
+                        "timestamp": review_results["timestamp_to_request"]
                     }
                 )
         except (requests.exceptions.HTTPError,
