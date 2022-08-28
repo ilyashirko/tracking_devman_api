@@ -1,4 +1,5 @@
 import json
+import logging
 from textwrap import dedent
 import time
 
@@ -13,6 +14,8 @@ LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 if __name__ == '__main__':
     env = Env()
     env.read_env()
+    logging.basicConfig(level=logging.DEBUG)
+    logging.info('Start bot')
 
     bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
 
@@ -53,6 +56,7 @@ if __name__ == '__main__':
                         chat_id=env.str('TELEGRAM_USER_ID'),
                         text=dedent(message)
                     )
+                    logging.info(f'GOT REVIEW for lesson \"{attempt["lesson_title"]}\"')
 
                 params.update(
                     {
@@ -68,7 +72,7 @@ if __name__ == '__main__':
         except (requests.exceptions.HTTPError,
                 requests.exceptions.ConnectionError,
                 json.decoder.JSONDecodeError) as error:
-            print(f'{error}\nRepeate request...')
+            logging.error(f'{error}\nRepeate request...')
             time.sleep(5)
         except requests.exceptions.ReadTimeout:
             pass
