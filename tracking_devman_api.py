@@ -1,26 +1,42 @@
 import json
 import logging
-from textwrap import dedent
 import time
+from textwrap import dedent
 
 import requests
 import telegram
-
 from environs import Env
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 
 
+class TelegramLogsHandler(logging.Handler):
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 if __name__ == '__main__':
     env = Env()
     env.read_env()
-    logging.basicConfig(level=logging.DEBUG)
-    logging.info('Start bot')
 
     bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
+    
+    logging.basicConfig(
+        filename=env.str('LOG_FILENAME'),
+        level=logging.INFO,
+        format="[%(asctime)s][%(levelname)s] %(message)s"
+    )
+    bot.logger.addHandler(TelegramLogsHandler(bot, env.str('TELEGRAM_USER_ID')))
+    bot.logger.info('Start bot')
 
     headers = {"Authorization": f"Token {env.str('DEVMAN_TOKEN')}"}
-    params = {}
+    params = dict()
 
     while True:
         try:
@@ -56,7 +72,7 @@ if __name__ == '__main__':
                         chat_id=env.str('TELEGRAM_USER_ID'),
                         text=dedent(message)
                     )
-                    logging.info(f'GOT REVIEW for lesson \"{attempt["lesson_title"]}\"')
+                    bot.logger.info(f'GOT REVIEW for lesson \"{attempt["lesson_title"]}\"')
 
                 params.update(
                     {
@@ -71,8 +87,8 @@ if __name__ == '__main__':
                 )
         except (requests.exceptions.HTTPError,
                 requests.exceptions.ConnectionError,
-                json.decoder.JSONDecodeError) as error:
-            logging.error(f'{error}\nRepeate request...')
+                json.decoder.JSONDecodeError,
+                requests.exceptions.ReadTimeout,
+                KeyError) as error:
+            bot.logger.error(f'{error}\nRepeate request...', exc_info=True)
             time.sleep(5)
-        except requests.exceptions.ReadTimeout:
-            pass
