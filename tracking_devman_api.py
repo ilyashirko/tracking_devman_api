@@ -28,7 +28,7 @@ if __name__ == '__main__':
     bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
     
     logging.basicConfig(
-        filename=env.str('LOG_FILENAME'),
+        filename=env.str('LOG_FILENAME', default='log.log'),
         level=logging.INFO,
         format="[%(asctime)s][%(levelname)s] %(message)s"
     )

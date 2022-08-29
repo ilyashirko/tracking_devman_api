@@ -7,13 +7,11 @@ git clone https://github.com/ilyashirko/tracking_devman_api
 ```
 Переместиться в корневую папку проекта и создать виртуальное окружение:
 ```
-cd tracking_devman_api
-python3 -m venv env
+cd tracking_devman_api && python3 -m venv env
 ```
 Активировать виртуальное окружение и установить зависимости:
 ```
-source env/bin/activate
-pip3 install -r requirements.txt
+source env/bin/activate && pip3 install -r requirements.txt
 ```
 Поместить чувствительные данные в `.env` файл. Вам потребуются:  
 1. Токен вашего телеграм бота. Создать бота и получить токен можно [здесь](BotFather)  
@@ -22,12 +20,15 @@ pip3 install -r requirements.txt
 
 Оформите ваши личные данные в файле `.env`:
 ```
-DEVMAN_TOKEN=dgsdfs87dfg8ds7f8g7sd8f7g98s7df78
-TELEGRAM_TOKEN=23423423423:AKJJHjkbjHbkbjkbKjbkjbkjbKjbKJbkJbkJb
-TELEGRAM_USER_ID=123456789
+DEVMAN_TOKEN=
+TELEGRAM_TOKEN=
+TELEGRAM_USER_ID=
 ```
+По умолчанию логи пишутся в файл `log.log`.  
+Если хотите указать свой файл - можете добавить переменную окружения `LOG_FILENAME=`  
 Для запуска бота введите в командной строке:
 ```
 python3 tracking_devman_api.py
 ```
-В случае получение вами результата проверки, он будет отправлен в бот.
+В случае получение вами результата проверки, он будет отправлен в бот.  
+В случае ошибок, содержание ошибки будет направлено в бота и в лог-файл.
