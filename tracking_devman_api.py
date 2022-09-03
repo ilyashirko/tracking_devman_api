@@ -86,9 +86,8 @@ if __name__ == '__main__':
                     }
                 )
         except (requests.exceptions.HTTPError,
-                requests.exceptions.ConnectionError,
-                json.decoder.JSONDecodeError,
-                requests.exceptions.ReadTimeout,
-                KeyError) as error:
+                requests.exceptions.ConnectionError) as error:
             bot.logger.error(f'{error}\nRepeate request...', exc_info=True)
             time.sleep(5)
+        except requests.exceptions.ReadTimeout:
+            pass
