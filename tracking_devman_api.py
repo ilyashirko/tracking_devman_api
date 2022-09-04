@@ -1,4 +1,3 @@
-import json
 import logging
 import time
 from textwrap import dedent
@@ -86,8 +85,8 @@ if __name__ == '__main__':
                     }
                 )
         except (requests.exceptions.HTTPError,
-                requests.exceptions.ConnectionError) as error:
-            bot.logger.error(f'{error}\nRepeate request...', exc_info=True)
+                requests.exceptions.ConnectionError):
+            bot.logger.exception('Repeate request...')
             time.sleep(5)
         except requests.exceptions.ReadTimeout:
             pass
