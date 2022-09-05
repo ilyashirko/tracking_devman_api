@@ -25,13 +25,15 @@ if __name__ == '__main__':
     env.read_env()
 
     bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
-    
+
     logging.basicConfig(
         filename=env.str('LOG_FILENAME', default='log.log'),
         level=logging.INFO,
         format="[%(asctime)s][%(levelname)s] %(message)s"
     )
-    bot.logger.addHandler(TelegramLogsHandler(bot, env.str('TELEGRAM_USER_ID')))
+    bot.logger.addHandler(
+        TelegramLogsHandler(bot, env.str('TELEGRAM_USER_ID'))
+    )
     bot.logger.info('Start bot')
 
     headers = {"Authorization": f"Token {env.str('DEVMAN_TOKEN')}"}
@@ -49,41 +51,46 @@ if __name__ == '__main__':
 
             review_results = response.json()
 
-            if review_results["status"] == 'found':
-                message = ''
-                for attempt in review_results["new_attempts"]:
-                    lesson_title = attempt['lesson_title']
-                    if attempt["is_negative"]:
-                        message += (
-                            f"""
-                            The lesson "{attempt["lesson_title"]}" has been sent for revision.
-                            {attempt["lesson_url"]}
-                            """
-                        )
-                    else:
-                        message += (
-                            f"""
-                            Congratulations!
-                            Lesson "{attempt["lesson_title"]}" passed!
-                            """
-                        )
-                    bot.send_message(
-                        chat_id=env.str('TELEGRAM_USER_ID'),
-                        text=dedent(message)
-                    )
-                    bot.logger.info(f'GOT REVIEW for lesson \"{attempt["lesson_title"]}\"')
-
-                params.update(
-                    {
-                        "timestamp": review_results["last_attempt_timestamp"]
-                    }
-                )
-            else:
+            if review_results["status"] != 'found':
                 params.update(
                     {
                         "timestamp": review_results["timestamp_to_request"]
                     }
                 )
+                continue
+
+            message = ''
+            for attempt in review_results["new_attempts"]:
+                lesson_title = attempt['lesson_title']
+                if attempt["is_negative"]:
+                    message += (
+                        f"""
+                        "{attempt["lesson_title"]}"
+                        The lesson has been sent for revision.
+                        {attempt["lesson_url"]}
+                        """
+                    )
+                else:
+                    message += (
+                        f"""
+                        Congratulations!
+                        Lesson "{attempt["lesson_title"]}" passed!
+                        """
+                    )
+                bot.send_message(
+                    chat_id=env.str('TELEGRAM_USER_ID'),
+                    text=dedent(message)
+                )
+                bot.logger.info(
+                    f'GOT REVIEW for lesson \"{attempt["lesson_title"]}\"'
+                )
+
+            params.update(
+                {
+                    "timestamp": review_results["last_attempt_timestamp"]
+                }
+            )
+
         except (requests.exceptions.HTTPError,
                 requests.exceptions.ConnectionError):
             bot.logger.exception('Repeate request...')
